@@ -8,16 +8,12 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   Provider,
-  ScheduleScanSetting,
   AWSCredential,
   AzureCredential,
   GCPCredential,
   AWSCredentialType,
   AzureCredentialType,
   GCPCredentialType,
-  AWSEventSource,
-  AzureEventSource,
-  GCPEventSource,
 } from "@/pages/users/cloud-management/common/models/cloudTypes";
 import {
   getProviderConfig,
@@ -34,54 +30,10 @@ import { ProxyUrlField } from "./fields/ProxyUrlField";
 import { ScanScheduleField } from "./fields/ScanScheduleField";
 import { ScanFrequencyField } from "./fields/ScanFrequencyField";
 import { EventIntegrationField } from "./fields/EventIntegrationField";
-
-// 프로바이더별 FormType 정의
-export type AWSFormType = {
-  provider: "AWS";
-  name: string;
-  cloudGroupName?: string[];
-  eventProcessEnabled: boolean;
-  userActivityEnabled: boolean;
-  scheduleScanEnabled: boolean;
-  scheduleScanSetting?: ScheduleScanSetting;
-  regionList: string[];
-  proxyUrl?: string;
-  credentials: AWSCredential;
-  credentialType: AWSCredentialType;
-  eventSource?: AWSEventSource;
-};
-
-export type AzureFormType = {
-  provider: "AZURE";
-  name: string;
-  cloudGroupName?: string[];
-  eventProcessEnabled: boolean;
-  userActivityEnabled: boolean;
-  scheduleScanEnabled: boolean;
-  scheduleScanSetting?: ScheduleScanSetting;
-  regionList: string[];
-  proxyUrl?: string;
-  credentials: AzureCredential;
-  credentialType: AzureCredentialType;
-  eventSource?: AzureEventSource;
-};
-
-export type GCPFormType = {
-  provider: "GCP";
-  name: string;
-  cloudGroupName?: string[];
-  eventProcessEnabled: boolean;
-  userActivityEnabled: boolean;
-  scheduleScanEnabled: boolean;
-  scheduleScanSetting?: ScheduleScanSetting;
-  regionList: string[];
-  proxyUrl?: string;
-  credentials: GCPCredential;
-  credentialType: GCPCredentialType;
-  eventSource?: GCPEventSource;
-};
-
-export type FormType = AWSFormType | AzureFormType | GCPFormType;
+import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
+import { AWSFormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
+import { AzureFormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
+import { GCPFormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
 
 // 프로바이더별 기본값 생성 함수
 export const getDefaultFormValues = (provider: Provider): FormType => {
@@ -293,11 +245,13 @@ export function CloudManagementDialog({
 
   const renderStep2 = () => {
     return (
-      <div className="space-y-6">
-        <ScanScheduleField />
-        <ScanFrequencyField />
-        <EventIntegrationField />
-      </div>
+      <FormProvider {...form}>
+        <div className="space-y-6">
+          <ScanScheduleField />
+          <ScanFrequencyField />
+          <EventIntegrationField />
+        </div>
+      </FormProvider>
     );
   };
 

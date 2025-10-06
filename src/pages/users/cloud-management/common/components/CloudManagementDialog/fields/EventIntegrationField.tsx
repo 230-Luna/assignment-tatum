@@ -6,7 +6,7 @@ import {
   getEventSourceFields,
   isFeatureSupported,
 } from "@/pages/users/cloud-management/common/utils/providerUtils";
-import { FormType } from "../index";
+import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
 
 export function EventIntegrationField() {
   const {
@@ -80,10 +80,7 @@ export function EventIntegrationField() {
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem
-                      value="disabled"
-                      id="event-disabled"
-                    />
+                    <RadioGroupItem value="disabled" id="event-disabled" />
                     <Label htmlFor="event-disabled" className="text-sm">
                       Disabled
                     </Label>
@@ -112,23 +109,14 @@ export function EventIntegrationField() {
                   className="flex gap-6"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem
-                      value="enabled"
-                      id="activity-enabled"
-                    />
+                    <RadioGroupItem value="enabled" id="activity-enabled" />
                     <Label htmlFor="activity-enabled" className="text-sm">
                       Enabled
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem
-                      value="disabled"
-                      id="activity-disabled"
-                    />
-                    <Label
-                      htmlFor="activity-disabled"
-                      className="text-sm"
-                    >
+                    <RadioGroupItem value="disabled" id="activity-disabled" />
+                    <Label htmlFor="activity-disabled" className="text-sm">
                       Disabled
                     </Label>
                   </div>
@@ -145,9 +133,7 @@ export function EventIntegrationField() {
             config={field}
             value={
               (watchedEventSource &&
-                (watchedEventSource as Record<string, string>)[
-                  field.key
-                ]) ||
+                (watchedEventSource as Record<string, string>)[field.key]) ||
               ""
             }
             onChange={(value) =>
@@ -157,12 +143,9 @@ export function EventIntegrationField() {
               errors.eventSource &&
               typeof errors.eventSource === "object" &&
               field.key in errors.eventSource
-                ? (
-                    errors.eventSource as Record<
-                      string,
-                      { message?: string }
-                    >
-                  )[field.key]?.message
+                ? (errors.eventSource as Record<string, { message?: string }>)[
+                    field.key
+                  ]?.message
                 : undefined
             }
           />

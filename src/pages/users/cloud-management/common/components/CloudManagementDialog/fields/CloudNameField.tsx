@@ -1,7 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Controller, useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { FormType } from "..";
+import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
 import { ErrorMessage } from "../../ErrorMessage";
 
 export function CloudNameField() {

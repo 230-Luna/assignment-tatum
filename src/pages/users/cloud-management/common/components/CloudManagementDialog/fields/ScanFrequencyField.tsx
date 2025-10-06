@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { isFeatureSupported } from "@/pages/users/cloud-management/common/utils/providerUtils";
-import { FormType } from "../index";
+import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
 
 const SCAN_HOURS = Array.from({ length: 24 }, (_, i) => {
   const hour = i.toString().padStart(2, "0");

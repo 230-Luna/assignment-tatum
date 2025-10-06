@@ -2,7 +2,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { isFeatureSupported } from "@/pages/users/cloud-management/common/utils/providerUtils";
-import { FormType } from "../index";
+import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
 
 export function ScanScheduleField() {
   const { control, watch } = useFormContext<FormType>();

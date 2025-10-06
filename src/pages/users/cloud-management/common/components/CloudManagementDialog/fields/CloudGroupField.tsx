@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Check, ChevronDown } from "lucide-react";
 import { CLOUD_GROUP_OPTIONS } from "@/pages/users/cloud-management/common/constants/cloud";
-import { FormType } from "../index";
+import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
 
 export function CloudGroupField() {
   const [groupDropdownOpen, setGroupDropdownOpen] = useState(false);
