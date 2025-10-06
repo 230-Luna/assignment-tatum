@@ -41,7 +41,8 @@ import {
 } from "@/pages/users/cloud-management/common/utils/providerUtils";
 import { DynamicField } from "@/components/DynamicField";
 import { getSchemaByProvider } from "@/pages/users/cloud-management/common/schemas/validationSchemas";
-import { CloudNameField } from "./CloudNameField";
+import { CloudNameField } from "./fields/CloudNameField";
+import { SelectProviderField } from "./fields/SelectProviderField";
 
 // 프로바이더별 FormType 정의
 export type AWSFormType = {
@@ -108,7 +109,7 @@ const SCAN_MINUTES = Array.from({ length: 13 }, (_, i) => {
 });
 
 // 프로바이더별 기본값 생성 함수
-const getDefaultFormValues = (provider: Provider): FormType => {
+export const getDefaultFormValues = (provider: Provider): FormType => {
   const providerConfig = getProviderConfig(provider);
   const defaultCredentialType = providerConfig.credentialTypes.find(
     (type) => !type.disabled
@@ -375,55 +376,7 @@ export function CloudManagementDialog({
       <FormProvider {...form}>
         <div className="space-y-6">
           <CloudNameField />
-
-          {/* Select Provider */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Select Provider
-            </Label>
-            <Controller
-              name="provider"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  value={field.value}
-                  onValueChange={(value: Provider) => {
-                    // 프로바이더 변경 시 해당 프로바이더의 기본값으로 리셋
-                    const newDefaults = getDefaultFormValues(value);
-
-                    // 기본 정보는 유지하고 프로바이더 관련 필드만 리셋
-                    const currentName = getValues("name");
-                    const currentCloudGroupName = getValues("cloudGroupName");
-                    const currentProxyUrl = getValues("proxyUrl");
-
-                    // 프로바이더 변경 시 폼 리셋
-
-                    reset({
-                      ...newDefaults,
-                      name: currentName,
-                      cloudGroupName: currentCloudGroupName,
-                      proxyUrl: currentProxyUrl,
-                    });
-
-                    field.onChange(value);
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="AWS">AWS</SelectItem>
-                    <SelectItem value="AZURE" disabled={true}>
-                      AZURE
-                    </SelectItem>
-                    <SelectItem value="GCP" disabled={true}>
-                      GCP
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </div>
+          <SelectProviderField />
 
           {/* Select Key Registration Method */}
           <div className="space-y-2">

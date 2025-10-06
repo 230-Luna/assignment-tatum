@@ -1,8 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Controller, useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { FormType } from ".";
-import { ErrorMessage } from "../ErrorMessage";
+import { FormType } from "..";
+import { ErrorMessage } from "../../ErrorMessage";
 
 export function CloudNameField() {
   const {
