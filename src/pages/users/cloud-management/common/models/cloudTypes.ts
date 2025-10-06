@@ -58,6 +58,17 @@ export interface GCPEventSource {
   storageAccountName?: string;
 }
 
+export type ScheduleScanFrequency = "HOUR" | "DAY" | "WEEK" | "MONTH";
+
+export type ScheduleScanWeekday =
+  | "MON"
+  | "TUE"
+  | "WED"
+  | "THU"
+  | "FRI"
+  | "SAT"
+  | "SUN";
+
 export interface ScheduleScanSetting {
   /**
    * frequency에 따라 각 필드의 필수 여부가 변경됨. 어떤 필드가 필수로 올지는 자유롭게 선택
@@ -66,11 +77,11 @@ export interface ScheduleScanSetting {
    * WEEK  : 매주을 의미
    * MONTH : 매월을 의미
    */
-  frequency: "HOUR" | "DAY" | "WEEK" | "MONTH";
-  date?: string; // '1' ~ '28'      // 29, 30, 31일은 무시?
-  weekday?: "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT" | "SUN";
+  frequency: ScheduleScanFrequency;
+  date?: string; // '1' ~ '28'      
+  weekday?: ScheduleScanWeekday;
   hour?: string; // '0' ~ '23'
-  minute?: string; // '0' ~ '60', '5' 단위로 증가   // 1hr 60min ??
+  minute?: string; // '0' ~ '60', '5' 단위로 증가   
 }
 
 // 상세 정보 불러오는 API를 GET, 저장하는 API를 PUT으로 가정
