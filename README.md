@@ -1,40 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# API를 관리하는 방법
 
-## Getting Started
+수 많은 API를 잘 관리하기 위해서는
 
-First, run the development server:
+- 레이어를 통한 추상화
+- 사용하는 곳에서의 응집도
+  를 고려해 API가 관리 되어야 한다고 생각합니다.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+  따라서 저는 아래와 같은 방법으로 API를 관리하는 방법을 택할 것 같습니다.
+
+1. 레이어를 통한 추상화
+
+- 모든 API 호출 및 응답 흐름에서 공통적으로 적용되는 로직은 axios와 같은 HTTP Client의 interceptors로 핸들링 하여 모든 API 호출할때 공통적으로 적용되어야 한다고 생각합니다.
+- 위에서 정의한 공통 HTTP 호출 모듈을 사용하여 API Path별로 호출하는 래핑 함수를 만듭니다.
+- 렌더링에 필요한 GET과 같은 API는 React Query의 useQuery나 useSuspenseQuery를 통해 API Path 별로 호출하는 래핑 함수를 사용합니다.
+- Query의 원활한 관리를 위해서 queryOptions를 따로 정의하는 것도 좋다고 생각합니다.
+- 결론: HTTP 호출 모듈, 각 API를 호출하는 래핑함수, 래핑함수를 사용하는 queryOptions로 레이어링을 통한 추상화를 통해 API를 관리할 것 같습니다.
+
+2. 사용하는 곳에서의 응집도
+
+- 모든 API가 재사용되는 것은 아닙니다.
+- 특정 페이지에서만 사용하는 API는 해당하는 API를 호출하는 곳과 폴더구조가 최대한 가깝게 유지되어야 수 많은 API를 유지보수하기에 용이합니다.
+- 여러 곳에서 사용하는 API는 모든 페이지가 이동할 수 있는 디렉토리로 이동시킵니다.
+- API의 응답값 타이핑도 API가 정의된 래핑함수와 최대한 가까워야 유지보수 하기에 용이합니다.
+- 따라서 API 응답값 타이핑은 API가 정의된 래핑함수가 있는 파일에 동시에 위치시키고 export 시킵니다.
+- 다만 동일한 DTO를 여러 API에서 응답으로 받는다면 models 폴더로 이동시켜 DTO를 재활용 할수 있게 만듭니다.
+- 결론: API를 사용하는 곳과 최대한 응집시켜 유지보수하기 편리하게 하고, 필요한 경우에만 상위 디렉토리로 올려 응집도를 높히는 방법으로 API를 관리할 것 같습니다.
+
+위와 같은 방법이 적용되어 만들어진 최종 디렉토리 구조는 아래와 같습니다.
+
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+src
+ ┣ apis (여러 곳에서 사용되는 API Path 별로 래핑된 함수를 모아놓는 디렉토리)
+ ┣ models  (여러 곳에서 중복으로 사용되는 DTO를 모아놓는 디렉토리)
+ ┣ pages
+ ┃ ┗ cloud-list (특정한 페이지)
+ ┃ ┃ ┣ apis (특정한 페이지에서만 사용되는 API Path 별로 래핑된 함수를 모아놓는 디렉토리)
+ ┃ ┃ ┣ models (특정한 페이지에서 중복으로 사용되는 DTO를 모아놓는 디렉토리)
+ ┃ ┃ ┗ query-options (특정한 페이지에서만 사용되는 queryOptions를 모아놓는 디렉토리)
+ ┣ query-options (여러 곳에서 사용되는 queryOptions를 모아놓는 디렉토리)
+ ┗ utils
+ ┃ ┗ httpClient.ts (모든 API 호출 및 응답 흐름에서 공통적으로 적용되는 로직이 axios와 같은 HTTP Client의 interceptors등을 통해 핸들링 되고 있는 모듈)
+```
