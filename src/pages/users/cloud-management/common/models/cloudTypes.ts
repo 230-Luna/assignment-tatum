@@ -34,6 +34,8 @@ export interface AWSEventSource {
 }
 
 // 타 프로바이더 예시, 미사용
+export const AzureRegionList = ["global"] as const;
+
 export type AzureCredentialType = "APPLICATION";
 
 export interface AzureCredential {
@@ -46,6 +48,8 @@ export interface AzureCredential {
 export interface AzureEventSource {
   storageAccountName?: string;
 }
+
+export const GCPRegionList = ["global"] as const;
 
 export type GCPCredentialType = "JSON_TEXT";
 
@@ -78,10 +82,10 @@ export interface ScheduleScanSetting {
    * MONTH : 매월을 의미
    */
   frequency: ScheduleScanFrequency;
-  date?: string; // '1' ~ '28'      
+  date?: string; // '1' ~ '28'
   weekday?: ScheduleScanWeekday;
   hour?: string; // '0' ~ '23'
-  minute?: string; // '0' ~ '60', '5' 단위로 증가   
+  minute?: string; // '0' ~ '60', '5' 단위로 증가
 }
 
 // 상세 정보 불러오는 API를 GET, 저장하는 API를 PUT으로 가정

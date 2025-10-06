@@ -187,8 +187,8 @@ export function CloudManagementDialog({
             {form.watch("scheduleScanEnabled") === true ? (
               <ScheduleScanSettingField />
             ) : null}
-            {/* <RegionField />
-            <ProxyUrlField /> */}
+            <RegionField />
+            <ProxyUrlField />
             {/* <ScanFrequencyField /> */}
             {/* <EventIntegrationField /> */}
           </div>
@@ -197,10 +197,10 @@ export function CloudManagementDialog({
         {/* 하단 버튼 */}
         <div className="flex justify-end gap-3 mt-8 pt-6 border-t">
           <Button type="button" variant="outline" onClick={handleCancel}>
-            취소
+            Cancel
           </Button>
           <Button type="button" onClick={handleConfirmClick}>
-            확인
+            Confirm
           </Button>
         </div>
       </DialogContent>

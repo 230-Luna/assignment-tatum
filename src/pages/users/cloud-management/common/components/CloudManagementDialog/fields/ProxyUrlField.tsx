@@ -2,6 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Controller, useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
+import { ErrorMessage } from "../../ErrorMessage";
 
 export function ProxyUrlField() {
   const {
@@ -12,7 +13,7 @@ export function ProxyUrlField() {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <Label className="text-sm font-medium text-gray-700">Proxy URL</Label>
+        <Label>Proxy URL</Label>
       </div>
       <Controller
         name="proxyUrl"
@@ -22,13 +23,11 @@ export function ProxyUrlField() {
             <Input
               placeholder="Please enter the proxy URL."
               {...field}
-              className={`w-full ${errors.proxyUrl ? "border-red-500" : ""}`}
+              hasError={!!errors.proxyUrl}
             />
-            {errors.proxyUrl && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.proxyUrl.message}
-              </p>
-            )}
+            {errors.proxyUrl ? (
+              <ErrorMessage>{errors.proxyUrl.message}</ErrorMessage>
+            ) : null}
           </div>
         )}
       />

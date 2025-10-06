@@ -14,7 +14,7 @@ export function CloudGroupField() {
 
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-medium text-gray-700">Cloud Group</Label>
+      <Label>Cloud Group</Label>
       <div className="relative">
         <div className="border rounded-md bg-white">
           <div
@@ -23,8 +23,8 @@ export function CloudGroupField() {
           >
             <span className="text-sm text-gray-700">
               {watchedCloudGroupName && watchedCloudGroupName.length > 0
-                ? `${watchedCloudGroupName.length}개 그룹 선택됨`
-                : "클라우드 그룹을 선택하세요"}
+                ? `${watchedCloudGroupName.length} groups selected`
+                : "Select Cloud Group"}
             </span>
             <ChevronDown
               className={`h-4 w-4 text-gray-400 transition-transform ${
@@ -58,7 +58,7 @@ export function CloudGroupField() {
       </div>
       {watchedCloudGroupName && watchedCloudGroupName.length > 0 && (
         <div className="text-xs text-gray-500">
-          선택된 그룹: {watchedCloudGroupName.join(", ")}
+          Selected groups: {watchedCloudGroupName.join(", ")}
         </div>
       )}
     </div>
