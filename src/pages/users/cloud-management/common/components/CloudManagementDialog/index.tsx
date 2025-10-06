@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, FormProvider } from "react-hook-form";
 import {
   Dialog,
   DialogContent,
@@ -41,6 +41,7 @@ import {
 } from "@/pages/users/cloud-management/common/utils/providerUtils";
 import { DynamicField } from "@/components/DynamicField";
 import { getSchemaByProvider } from "@/pages/users/cloud-management/common/schemas/validationSchemas";
+import { CloudNameField } from "./CloudNameField";
 
 // 프로바이더별 FormType 정의
 export type AWSFormType = {
@@ -371,334 +372,304 @@ export function CloudManagementDialog({
     const regionList = getRegionList(watchedProvider);
 
     return (
-      <div className="space-y-6">
-        {/* Cloud Name */}
-        <div className="space-y-2">
-          <Label
-            htmlFor="cloudName"
-            className="text-sm font-medium text-gray-700"
-          >
-            Cloud Name <span className="text-red-500">*</span>
-          </Label>
-          <Controller
-            name="name"
-            control={control}
-            rules={{
-              required: "Cloud Name는 필수입니다.",
-              validate: (value) => {
-                if (!value?.trim()) {
-                  return "Cloud Name는 필수입니다.";
-                }
-                return true;
-              },
-            }}
-            render={({ field }) => (
-              <div>
-                <Input
-                  id="cloudName"
-                  placeholder="Please enter the cloud name."
-                  {...field}
-                  className={`w-full ${errors.name ? "border-red-500" : ""}`}
-                />
-                {errors.name && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.name.message}
-                  </p>
-                )}
-              </div>
-            )}
-          />
-        </div>
+      <FormProvider {...form}>
+        <div className="space-y-6">
+          <CloudNameField />
 
-        {/* Select Provider */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">
-            Select Provider
-          </Label>
-          <Controller
-            name="provider"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={field.value}
-                onValueChange={(value: Provider) => {
-                  // 프로바이더 변경 시 해당 프로바이더의 기본값으로 리셋
-                  const newDefaults = getDefaultFormValues(value);
+          {/* Select Provider */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700">
+              Select Provider
+            </Label>
+            <Controller
+              name="provider"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(value: Provider) => {
+                    // 프로바이더 변경 시 해당 프로바이더의 기본값으로 리셋
+                    const newDefaults = getDefaultFormValues(value);
 
-                  // 기본 정보는 유지하고 프로바이더 관련 필드만 리셋
-                  const currentName = getValues("name");
-                  const currentCloudGroupName = getValues("cloudGroupName");
-                  const currentProxyUrl = getValues("proxyUrl");
+                    // 기본 정보는 유지하고 프로바이더 관련 필드만 리셋
+                    const currentName = getValues("name");
+                    const currentCloudGroupName = getValues("cloudGroupName");
+                    const currentProxyUrl = getValues("proxyUrl");
 
-                  // 프로바이더 변경 시 폼 리셋
+                    // 프로바이더 변경 시 폼 리셋
 
-                  reset({
-                    ...newDefaults,
-                    name: currentName,
-                    cloudGroupName: currentCloudGroupName,
-                    proxyUrl: currentProxyUrl,
-                  });
+                    reset({
+                      ...newDefaults,
+                      name: currentName,
+                      cloudGroupName: currentCloudGroupName,
+                      proxyUrl: currentProxyUrl,
+                    });
 
-                  field.onChange(value);
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="AWS">AWS</SelectItem>
-                  <SelectItem value="AZURE" disabled={true}>
-                    AZURE
-                  </SelectItem>
-                  <SelectItem value="GCP" disabled={true}>
-                    GCP
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
-
-        {/* Select Key Registration Method */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">
-            Select Key Registration Method
-          </Label>
-          <Controller
-            name="credentialType"
-            control={control}
-            render={({ field }) => (
-              <Select
-                value={field.value}
-                onValueChange={(value) => {
-                  // credentialType 변경 시 credentials 초기화
-                  const emptyCredentials = (() => {
-                    switch (watchedProvider) {
-                      case "AWS":
-                        return {} as AWSCredential;
-                      case "AZURE":
-                        return {} as AzureCredential;
-                      case "GCP":
-                        return {} as GCPCredential;
-                      default:
-                        return {} as AWSCredential;
-                    }
-                  })();
-
-                  setValue("credentials", emptyCredentials);
-                  field.onChange(value);
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {providerConfig.credentialTypes.map((type) => (
-                    <SelectItem
-                      key={type.value}
-                      value={type.value}
-                      disabled={type.value !== "ACCESS_KEY"}
-                    >
-                      {type.label}
+                    field.onChange(value);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="AWS">AWS</SelectItem>
+                    <SelectItem value="AZURE" disabled={true}>
+                      AZURE
                     </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
-
-        {/* Dynamic Credentials Fields */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Credentials
-            </Label>
-          </div>
-
-          <div className="space-y-3">
-            {credentialFields.map((field) => (
-              <DynamicField
-                key={field.key}
-                config={field}
-                value={
-                  (watchedCredentials as unknown as Record<string, string>)[
-                    field.key
-                  ] || ""
-                }
-                onChange={(value) =>
-                  handleCredentialFieldChange(field.key, value as string)
-                }
-                showPassword={showPasswordFields[field.key] || false}
-                onTogglePassword={
-                  field.type === "password"
-                    ? () => togglePasswordVisibility(field.key)
-                    : undefined
-                }
-                error={
-                  errors.credentials &&
-                  typeof errors.credentials === "object" &&
-                  field.key in errors.credentials
-                    ? (
-                        errors.credentials as Record<
-                          string,
-                          { message?: string }
-                        >
-                      )[field.key]?.message
-                    : undefined
-                }
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Region */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Label className="text-sm font-medium text-gray-700">Region</Label>
-          </div>
-          <div className="relative">
-            <div className="border rounded-md bg-white">
-              <div
-                className="flex items-center justify-between p-3 cursor-pointer"
-                onClick={() => setRegionDropdownOpen(!regionDropdownOpen)}
-              >
-                <span className="text-sm text-gray-700">
-                  {watchedRegionList.length > 0
-                    ? `${watchedRegionList.length}개 지역 선택됨`
-                    : "지역을 선택하세요"}
-                </span>
-                <ChevronDown
-                  className={`h-4 w-4 text-gray-400 transition-transform ${
-                    regionDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
-              {regionDropdownOpen && (
-                <div className="border-t max-h-48 overflow-y-auto">
-                  {regionList.map((region) => (
-                    <div
-                      key={region}
-                      className="flex items-center justify-between p-2 hover:bg-gray-50 cursor-pointer"
-                      onClick={() => {
-                        if (region === "global") {
-                          // global은 항상 포함되어야 하므로 해제 불가
-                          return;
-                        }
-                        const newRegionList = watchedRegionList.includes(region)
-                          ? watchedRegionList.filter((r) => r !== region)
-                          : [...watchedRegionList, region];
-                        setValue("regionList", newRegionList);
-                      }}
-                    >
-                      <span className="text-sm text-gray-700">
-                        {region}
-                        {region === "global" && " (기본 포함)"}
-                      </span>
-                      {watchedRegionList.includes(region) && (
-                        <Check
-                          className={`h-4 w-4 ${
-                            region === "global"
-                              ? "text-gray-400"
-                              : "text-blue-600"
-                          }`}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
+                    <SelectItem value="GCP" disabled={true}>
+                      GCP
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               )}
-            </div>
+            />
           </div>
-          {watchedRegionList.length > 0 && (
-            <div className="text-xs text-gray-500">
-              선택된 지역: {watchedRegionList.join(", ")}
-            </div>
-          )}
-        </div>
 
-        {/* Cloud Group */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-gray-700">
-            Cloud Group
-          </Label>
-          <div className="relative">
-            <div className="border rounded-md bg-white">
-              <div
-                className="flex items-center justify-between p-3 cursor-pointer"
-                onClick={() => setGroupDropdownOpen(!groupDropdownOpen)}
-              >
-                <span className="text-sm text-gray-700">
-                  {watchedCloudGroupName && watchedCloudGroupName.length > 0
-                    ? `${watchedCloudGroupName.length}개 그룹 선택됨`
-                    : "클라우드 그룹을 선택하세요"}
-                </span>
-                <ChevronDown
-                  className={`h-4 w-4 text-gray-400 transition-transform ${
-                    groupDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </div>
-              {groupDropdownOpen && (
-                <div className="border-t max-h-48 overflow-y-auto">
-                  {CLOUD_GROUP_OPTIONS.map((group) => (
-                    <div
-                      key={group}
-                      className="flex items-center justify-between p-2 hover:bg-gray-50 cursor-pointer"
-                      onClick={() => {
-                        const currentGroups = watchedCloudGroupName || [];
-                        const newGroupList = currentGroups.includes(group)
-                          ? currentGroups.filter((g) => g !== group)
-                          : [...currentGroups, group];
-                        setValue("cloudGroupName", newGroupList);
-                      }}
-                    >
-                      <span className="text-sm text-gray-700">{group}</span>
-                      {watchedCloudGroupName?.includes(group) && (
-                        <Check className="h-4 w-4 text-blue-600" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          {watchedCloudGroupName && watchedCloudGroupName.length > 0 && (
-            <div className="text-xs text-gray-500">
-              선택된 그룹: {watchedCloudGroupName.join(", ")}
-            </div>
-          )}
-        </div>
-
-        {/* Proxy URL */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
+          {/* Select Key Registration Method */}
+          <div className="space-y-2">
             <Label className="text-sm font-medium text-gray-700">
-              Proxy URL
+              Select Key Registration Method
             </Label>
+            <Controller
+              name="credentialType"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    // credentialType 변경 시 credentials 초기화
+                    const emptyCredentials = (() => {
+                      switch (watchedProvider) {
+                        case "AWS":
+                          return {} as AWSCredential;
+                        case "AZURE":
+                          return {} as AzureCredential;
+                        case "GCP":
+                          return {} as GCPCredential;
+                        default:
+                          return {} as AWSCredential;
+                      }
+                    })();
+
+                    setValue("credentials", emptyCredentials);
+                    field.onChange(value);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {providerConfig.credentialTypes.map((type) => (
+                      <SelectItem
+                        key={type.value}
+                        value={type.value}
+                        disabled={type.value !== "ACCESS_KEY"}
+                      >
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
-          <Controller
-            name="proxyUrl"
-            control={control}
-            render={({ field }) => (
-              <div>
-                <Input
-                  placeholder="Please enter the proxy URL."
-                  {...field}
-                  className={`w-full ${
-                    errors.proxyUrl ? "border-red-500" : ""
-                  }`}
+
+          {/* Dynamic Credentials Fields */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Credentials
+              </Label>
+            </div>
+
+            <div className="space-y-3">
+              {credentialFields.map((field) => (
+                <DynamicField
+                  key={field.key}
+                  config={field}
+                  value={
+                    (watchedCredentials as unknown as Record<string, string>)[
+                      field.key
+                    ] || ""
+                  }
+                  onChange={(value) =>
+                    handleCredentialFieldChange(field.key, value as string)
+                  }
+                  showPassword={showPasswordFields[field.key] || false}
+                  onTogglePassword={
+                    field.type === "password"
+                      ? () => togglePasswordVisibility(field.key)
+                      : undefined
+                  }
+                  error={
+                    errors.credentials &&
+                    typeof errors.credentials === "object" &&
+                    field.key in errors.credentials
+                      ? (
+                          errors.credentials as Record<
+                            string,
+                            { message?: string }
+                          >
+                        )[field.key]?.message
+                      : undefined
+                  }
                 />
-                {errors.proxyUrl && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {errors.proxyUrl.message}
-                  </p>
+              ))}
+            </div>
+          </div>
+
+          {/* Region */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Region
+              </Label>
+            </div>
+            <div className="relative">
+              <div className="border rounded-md bg-white">
+                <div
+                  className="flex items-center justify-between p-3 cursor-pointer"
+                  onClick={() => setRegionDropdownOpen(!regionDropdownOpen)}
+                >
+                  <span className="text-sm text-gray-700">
+                    {watchedRegionList.length > 0
+                      ? `${watchedRegionList.length}개 지역 선택됨`
+                      : "지역을 선택하세요"}
+                  </span>
+                  <ChevronDown
+                    className={`h-4 w-4 text-gray-400 transition-transform ${
+                      regionDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </div>
+                {regionDropdownOpen && (
+                  <div className="border-t max-h-48 overflow-y-auto">
+                    {regionList.map((region) => (
+                      <div
+                        key={region}
+                        className="flex items-center justify-between p-2 hover:bg-gray-50 cursor-pointer"
+                        onClick={() => {
+                          if (region === "global") {
+                            // global은 항상 포함되어야 하므로 해제 불가
+                            return;
+                          }
+                          const newRegionList = watchedRegionList.includes(
+                            region
+                          )
+                            ? watchedRegionList.filter((r) => r !== region)
+                            : [...watchedRegionList, region];
+                          setValue("regionList", newRegionList);
+                        }}
+                      >
+                        <span className="text-sm text-gray-700">
+                          {region}
+                          {region === "global" && " (기본 포함)"}
+                        </span>
+                        {watchedRegionList.includes(region) && (
+                          <Check
+                            className={`h-4 w-4 ${
+                              region === "global"
+                                ? "text-gray-400"
+                                : "text-blue-600"
+                            }`}
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
+            </div>
+            {watchedRegionList.length > 0 && (
+              <div className="text-xs text-gray-500">
+                선택된 지역: {watchedRegionList.join(", ")}
+              </div>
             )}
-          />
+          </div>
+
+          {/* Cloud Group */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700">
+              Cloud Group
+            </Label>
+            <div className="relative">
+              <div className="border rounded-md bg-white">
+                <div
+                  className="flex items-center justify-between p-3 cursor-pointer"
+                  onClick={() => setGroupDropdownOpen(!groupDropdownOpen)}
+                >
+                  <span className="text-sm text-gray-700">
+                    {watchedCloudGroupName && watchedCloudGroupName.length > 0
+                      ? `${watchedCloudGroupName.length}개 그룹 선택됨`
+                      : "클라우드 그룹을 선택하세요"}
+                  </span>
+                  <ChevronDown
+                    className={`h-4 w-4 text-gray-400 transition-transform ${
+                      groupDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </div>
+                {groupDropdownOpen && (
+                  <div className="border-t max-h-48 overflow-y-auto">
+                    {CLOUD_GROUP_OPTIONS.map((group) => (
+                      <div
+                        key={group}
+                        className="flex items-center justify-between p-2 hover:bg-gray-50 cursor-pointer"
+                        onClick={() => {
+                          const currentGroups = watchedCloudGroupName || [];
+                          const newGroupList = currentGroups.includes(group)
+                            ? currentGroups.filter((g) => g !== group)
+                            : [...currentGroups, group];
+                          setValue("cloudGroupName", newGroupList);
+                        }}
+                      >
+                        <span className="text-sm text-gray-700">{group}</span>
+                        {watchedCloudGroupName?.includes(group) && (
+                          <Check className="h-4 w-4 text-blue-600" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            {watchedCloudGroupName && watchedCloudGroupName.length > 0 && (
+              <div className="text-xs text-gray-500">
+                선택된 그룹: {watchedCloudGroupName.join(", ")}
+              </div>
+            )}
+          </div>
+
+          {/* Proxy URL */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Proxy URL
+              </Label>
+            </div>
+            <Controller
+              name="proxyUrl"
+              control={control}
+              render={({ field }) => (
+                <div>
+                  <Input
+                    placeholder="Please enter the proxy URL."
+                    {...field}
+                    className={`w-full ${
+                      errors.proxyUrl ? "border-red-500" : ""
+                    }`}
+                  />
+                  {errors.proxyUrl && (
+                    <p className="text-sm text-red-500 mt-1">
+                      {errors.proxyUrl.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            />
+          </div>
         </div>
-      </div>
+      </FormProvider>
     );
   };
 
