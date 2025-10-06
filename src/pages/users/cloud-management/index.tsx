@@ -71,8 +71,6 @@ export function CloudTable() {
     if (result == null) {
       return;
     }
-
-    console.log("Cloud 생성 완료:", result);
   };
 
   return (
@@ -134,8 +132,6 @@ function CloudTableRow({ cloud }: { cloud: Cloud }) {
     if (result == null) {
       return;
     }
-
-    console.log("Cloud 수정 완료:", result);
   };
 
   const handleDeleteCloud = async (cloud: Cloud) => {

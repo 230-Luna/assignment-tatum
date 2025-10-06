@@ -62,10 +62,10 @@ export function SelectProviderField() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="AWS">AWS</SelectItem>
-              <SelectItem value="AZURE" disabled={false}>
+              <SelectItem value="AZURE" disabled={true}>
                 AZURE
               </SelectItem>
-              <SelectItem value="GCP" disabled={false}>
+              <SelectItem value="GCP" disabled={true}>
                 GCP
               </SelectItem>
             </SelectContent>

@@ -26,6 +26,10 @@ import { GCPFormType } from "@/pages/users/cloud-management/common/models/Provid
 import { EventProcessEnabledField } from "./fields/EventProcessEnabledField";
 import { UserActivityEnabledField } from "./fields/UserActivityEnabled";
 import { ScheduleScanEnabledField } from "./fields/ScheduleScanEnabledField";
+import { AccessKeyIdField } from "./fields/AccessKeyIdField";
+import { SecretAccessKeyField } from "./fields/SecretAccessKeyField";
+import { AWSCredentialTypeField } from "./fields/AWSCredentialTypeField";
+import { CloudTrailNameField } from "./fields/CloudTrailNameField";
 
 // 프로바이더별 기본값 생성 함수
 export const getDefaultFormValues = (provider: Provider): FormType => {
@@ -104,12 +108,10 @@ export function CloudManagementDialog({
   };
 
   const onSubmit = (formData: FormType) => {
-    // 수동 Zod 유효성 검사
     const schema = getSchemaByProvider(formData.provider);
     const validationResult = schema.safeParse(formData);
 
     if (!validationResult.success) {
-      // 유효성 검사 실패 시 에러를 폼 필드에 설정
       clearErrors();
       validationResult.error.issues.forEach((err) => {
         const path = err.path.join(".");
@@ -121,10 +123,8 @@ export function CloudManagementDialog({
       return;
     }
 
-    // 검증 성공 시 에러 클리어
     clearErrors();
 
-    // 서버 전송용 페이로드 생성
     const payload = {
       ...formData,
       scheduleScanSetting: formData.scheduleScanEnabled
@@ -159,9 +159,7 @@ export function CloudManagementDialog({
     console.log("서버 전송용 페이로드:", payload);
   };
 
-  // 확인 버튼 클릭 핸들러 (disabled 상태에서도 유효성 검사 실행)
   const handleConfirmClick = () => {
-    console.log("form.getValues()", form.getValues());
     handleSubmit(onSubmit)();
   };
 
@@ -169,17 +167,24 @@ export function CloudManagementDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
-            <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center">
-              <div className="w-3 h-3 bg-blue-500 rounded"></div>
-            </div>
-            {data ? "Edit" : "Create"} Cloud
-          </DialogTitle>
+          <DialogTitle>{data ? "Edit" : "Create"} Cloud</DialogTitle>
         </DialogHeader>
         <FormProvider {...form}>
           <div className="space-y-6">
             <CloudNameField />
             <SelectProviderField />
+            {form.watch("provider") === "AWS" && (
+              <>
+                <AWSCredentialTypeField />
+                {form.watch("credentialType") === "ACCESS_KEY" && (
+                  <>
+                    <AccessKeyIdField />
+                    <SecretAccessKeyField />
+                  </>
+                )}
+                <CloudTrailNameField />
+              </>
+            )}
             <CloudGroupField />
             <EventProcessEnabledField />
             <UserActivityEnabledField />
@@ -189,12 +194,9 @@ export function CloudManagementDialog({
             ) : null}
             <RegionField />
             <ProxyUrlField />
-            {/* <ScanFrequencyField /> */}
-            {/* <EventIntegrationField /> */}
           </div>
         </FormProvider>
 
-        {/* 하단 버튼 */}
         <div className="flex justify-end gap-3 mt-8 pt-6 border-t">
           <Button type="button" variant="outline" onClick={handleCancel}>
             Cancel

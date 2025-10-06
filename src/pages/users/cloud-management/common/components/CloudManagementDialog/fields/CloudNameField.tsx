@@ -19,7 +19,7 @@ export function CloudNameField() {
         name="name"
         control={control}
         rules={{
-          required: "Cloud Name는 필수입니다.",
+          required: "Cloud Name is required.",
         }}
         render={({ field }) => (
           <div>

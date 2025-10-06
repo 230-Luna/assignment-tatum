@@ -2,18 +2,18 @@ import { z } from "zod";
 
 // Cloud Name 유효성 검사
 // required
-const cloudNameSchema = z.string().min(1, "Cloud Name는 필수입니다.");
+const cloudNameSchema = z.string().min(1, "Cloud Name is required.");
 
 // Access Key 유효성 검사
 // required
 // `AKIA`: IAM 사용자가 발급한 장기 액세스 키의 접두사
 // `AK`:  AWS 계정의 루트 사용자에게 발급된 액세스 키의 접두사
 // `ASIA`, `AKID`: IAM 사용자가 발급한 장기 액세스 키의 접두사
-const accessKeySchema = z.string().min(1, "Access Key는 필수입니다.");
+const accessKeySchema = z.string().min(1, "Access Key is required.");
 
 // Secret Key 유효성 검사
 // required
-const secretKeySchema = z.string().min(1, "Secret Key는 필수입니다.");
+const secretKeySchema = z.string().min(1, "Secret Key is required.");
 
 // Proxy URL 유효성 검사
 // - url 형식
@@ -47,15 +47,15 @@ const awsCredentialsSchema = z.object({
 
 // Azure Credentials 스키마 (기본적인 검증만 적용)
 const azureCredentialsSchema = z.object({
-  tenantId: z.string().min(1, "Tenant ID는 필수입니다."),
-  subscriptionId: z.string().min(1, "Subscription ID는 필수입니다."),
-  applicationId: z.string().min(1, "Application ID는 필수입니다."),
-  secretKey: z.string().min(1, "Secret Key는 필수입니다."),
+  tenantId: z.string().min(1, "Tenant ID is required."),
+  subscriptionId: z.string().min(1, "Subscription ID is required."),
+  applicationId: z.string().min(1, "Application ID is required."),
+  secretKey: z.string().min(1, "Secret Key is required."),
 });
 
 // GCP Credentials 스키마 (기본적인 검증만 적용)
 const gcpCredentialsSchema = z.object({
-  jsonText: z.string().min(1, "JSON 텍스트는 필수입니다."),
+  jsonText: z.string().min(1, "JSON 텍스트 is required."),
   projectId: z.string().optional(),
 });
 
