@@ -11,37 +11,24 @@ import {
   AWSCredential,
   AzureCredential,
   GCPCredential,
-  AWSCredentialType,
-  AzureCredentialType,
-  GCPCredentialType,
 } from "@/pages/users/cloud-management/common/models/cloudTypes";
-import {
-  getProviderConfig,
-  getCredentialFields,
-} from "@/pages/users/cloud-management/common/utils/providerUtils";
 import { getSchemaByProvider } from "@/pages/users/cloud-management/common/schemas/validationSchemas";
 import { CloudNameField } from "./fields/CloudNameField";
 import { SelectProviderField } from "./fields/SelectProviderField";
-import { CredentialTypeField } from "./fields/CredentialTypeField";
-import { CredentialsField } from "./fields/CredentialsField";
 import { RegionField } from "./fields/RegionField";
 import { CloudGroupField } from "./fields/CloudGroupField";
 import { ProxyUrlField } from "./fields/ProxyUrlField";
-import { ScanScheduleField } from "./fields/ScanScheduleField";
-import { ScanFrequencyField } from "./fields/ScanFrequencyField";
-import { EventIntegrationField } from "./fields/EventIntegrationField";
+import { ScheduleScanSettingField } from "./fields/ScheduleScanSettingField";
 import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
 import { AWSFormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
 import { AzureFormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
 import { GCPFormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
+import { EventProcessEnabledField } from "./fields/EventProcessEnabledField";
+import { UserActivityEnabledField } from "./fields/UserActivityEnabled";
+import { ScheduleScanEnabledField } from "./fields/ScheduleScanEnabledField";
 
 // 프로바이더별 기본값 생성 함수
 export const getDefaultFormValues = (provider: Provider): FormType => {
-  const providerConfig = getProviderConfig(provider);
-  const defaultCredentialType = providerConfig.credentialTypes.find(
-    (type) => !type.disabled
-  )?.value;
-
   const baseValues = {
     name: "",
     cloudGroupName: [],
@@ -63,8 +50,7 @@ export const getDefaultFormValues = (provider: Provider): FormType => {
       return {
         ...baseValues,
         provider: "AWS",
-        credentialType:
-          (defaultCredentialType as AWSCredentialType) || "ACCESS_KEY",
+        credentialType: "ACCESS_KEY",
         credentials: {} as AWSCredential,
       } as AWSFormType;
 
@@ -72,8 +58,7 @@ export const getDefaultFormValues = (provider: Provider): FormType => {
       return {
         ...baseValues,
         provider: "AZURE",
-        credentialType:
-          (defaultCredentialType as AzureCredentialType) || "APPLICATION",
+        credentialType: "APPLICATION",
         credentials: {} as AzureCredential,
       } as AzureFormType;
 
@@ -81,8 +66,7 @@ export const getDefaultFormValues = (provider: Provider): FormType => {
       return {
         ...baseValues,
         provider: "GCP",
-        credentialType:
-          (defaultCredentialType as GCPCredentialType) || "JSON_TEXT",
+        credentialType: "JSON_TEXT",
         credentials: {} as GCPCredential,
       } as GCPFormType;
 
@@ -112,12 +96,7 @@ export function CloudManagementDialog({
     mode: "onChange",
   });
 
-  const { handleSubmit, reset, watch, getValues, clearErrors, setError } = form;
-
-  // 폼 데이터 감시
-  const watchedProvider = watch("provider");
-  const watchedCredentialType = watch("credentialType");
-  const watchedCredentials = watch("credentials");
+  const { handleSubmit, reset, clearErrors, setError } = form;
 
   const handleCancel = () => {
     reset(data);
@@ -182,77 +161,8 @@ export function CloudManagementDialog({
 
   // 확인 버튼 클릭 핸들러 (disabled 상태에서도 유효성 검사 실행)
   const handleConfirmClick = () => {
-    const formData = getValues();
-
-    // 필수 필드 검증 및 에러 설정
-    let hasErrors = false;
-
-    // Cloud Name 검증
-    if (!formData.name?.trim()) {
-      setError("name", {
-        type: "manual",
-        message: "Cloud Name는 필수입니다.",
-      });
-      hasErrors = true;
-    }
-
-    // Credentials 필수 필드 검증
-    const credentialFields = getCredentialFields(
-      watchedProvider,
-      watchedCredentialType
-    );
-    const requiredCredentialFields = credentialFields.filter(
-      (field) => field.required
-    );
-
-    for (const field of requiredCredentialFields) {
-      const value = (watchedCredentials as unknown as Record<string, string>)?.[
-        field.key
-      ];
-      if (!value?.trim()) {
-        setError(`credentials.${field.key}` as keyof FormType, {
-          type: "manual",
-          message: `${field.label}는 필수입니다.`,
-        });
-        hasErrors = true;
-      }
-    }
-
-    // 에러가 있으면 제출하지 않음
-    if (hasErrors) {
-      return;
-    }
-
-    // 에러가 없으면 정상 제출
+    console.log("form.getValues()", form.getValues());
     handleSubmit(onSubmit)();
-  };
-
-  const renderStep1 = () => {
-    return (
-      <FormProvider {...form}>
-        <div className="space-y-6">
-          <CloudNameField />
-          <SelectProviderField />
-          <CredentialTypeField />
-          <CredentialsField />
-          <RegionField />
-          <CloudGroupField />
-          <ProxyUrlField />
-        </div>
-      </FormProvider>
-    );
-  };
-
-  const renderStep2 = () => {
-    return (
-      <FormProvider {...form}>
-        <div className="space-y-6">
-          <ScanScheduleField />
-          <ScanFrequencyField />
-          <EventIntegrationField />
-        </div>
-      </FormProvider>
-    );
   };
 
   return (
@@ -266,24 +176,23 @@ export function CloudManagementDialog({
             {data ? "Edit" : "Create"} Cloud
           </DialogTitle>
         </DialogHeader>
-
-        <div className="mt-6 space-y-8">
-          {/* Step 1 - Basic Information */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Basic Information
-            </h3>
-            {renderStep1()}
+        <FormProvider {...form}>
+          <div className="space-y-6">
+            <CloudNameField />
+            <SelectProviderField />
+            <CloudGroupField />
+            <EventProcessEnabledField />
+            <UserActivityEnabledField />
+            <ScheduleScanEnabledField />
+            {form.watch("scheduleScanEnabled") === true ? (
+              <ScheduleScanSettingField />
+            ) : null}
+            {/* <RegionField />
+            <ProxyUrlField /> */}
+            {/* <ScanFrequencyField /> */}
+            {/* <EventIntegrationField /> */}
           </div>
-
-          {/* Step 2 - Scan & Event Settings */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Scan & Event Settings
-            </h3>
-            {renderStep2()}
-          </div>
-        </div>
+        </FormProvider>
 
         {/* 하단 버튼 */}
         <div className="flex justify-end gap-3 mt-8 pt-6 border-t">

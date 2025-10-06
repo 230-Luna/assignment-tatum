@@ -15,14 +15,12 @@ import Image from "next/image";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { SSRSuspense } from "@/components/SSRSuspense";
 
-import {
-  CloudManagementDialog,
-  FormType,
-} from "./common/components/CloudManagementDialog";
+import { CloudManagementDialog } from "./common/components/CloudManagementDialog";
 import { useOverlay } from "@/hooks/useOverlay";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { IconButton } from "@/components/IconButton";
+import { FormType } from "./common/models/ProviderFormType";
 
 export function CloudManagementPage() {
   return (
