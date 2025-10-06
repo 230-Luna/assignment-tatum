@@ -44,6 +44,7 @@ import { getSchemaByProvider } from "@/pages/users/cloud-management/common/schem
 import { CloudNameField } from "./fields/CloudNameField";
 import { SelectProviderField } from "./fields/SelectProviderField";
 import { CredentialTypeField } from "./fields/CredentialTypeField";
+import { CredentialsField } from "./fields/CredentialsField";
 
 // 프로바이더별 FormType 정의
 export type AWSFormType = {
@@ -181,9 +182,6 @@ export function CloudManagementDialog({
   onComplete: ({ data }: { data?: FormType }) => void;
   data?: FormType;
 }) {
-  const [showPasswordFields, setShowPasswordFields] = useState<
-    Record<string, boolean>
-  >({});
   const [regionDropdownOpen, setRegionDropdownOpen] = useState(false);
   const [groupDropdownOpen, setGroupDropdownOpen] = useState(false);
 
@@ -214,47 +212,12 @@ export function CloudManagementDialog({
   const watchedCredentials = watch("credentials");
   const watchedEventSource = watch("eventSource");
 
-  const handleCredentialFieldChange = (fieldKey: string, value: string) => {
-    const currentCredentials = getValues("credentials");
-    setValue(
-      "credentials",
-      {
-        ...currentCredentials,
-        [fieldKey]: value,
-      },
-      { shouldValidate: true }
-    );
-
-    // 필수 필드 검증
-    const credentialFields = getCredentialFields(
-      watchedProvider,
-      watchedCredentialType
-    );
-    const fieldConfig = credentialFields.find((f) => f.key === fieldKey);
-
-    if (fieldConfig?.required && !value?.trim()) {
-      setError(`credentials.${fieldKey}` as keyof FormType, {
-        type: "manual",
-        message: `${fieldConfig.label}는 필수입니다.`,
-      });
-    } else {
-      clearErrors(`credentials.${fieldKey}` as keyof FormType);
-    }
-  };
-
   const handleEventSourceFieldChange = (fieldKey: string, value: string) => {
     const currentEventSource = getValues("eventSource");
     setValue("eventSource", {
       ...currentEventSource,
       [fieldKey]: value,
     });
-  };
-
-  const togglePasswordVisibility = (fieldKey: string) => {
-    setShowPasswordFields((prev) => ({
-      ...prev,
-      [fieldKey]: !prev[fieldKey],
-    }));
   };
 
   const handleCancel = () => {
@@ -366,10 +329,6 @@ export function CloudManagementDialog({
   };
 
   const renderStep1 = () => {
-    const credentialFields = getCredentialFields(
-      watchedProvider,
-      watchedCredentialType
-    );
     const regionList = getRegionList(watchedProvider);
 
     return (
@@ -378,50 +337,7 @@ export function CloudManagementDialog({
           <CloudNameField />
           <SelectProviderField />
           <CredentialTypeField />
-
-          {/* Dynamic Credentials Fields */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Label className="text-sm font-medium text-gray-700">
-                Credentials
-              </Label>
-            </div>
-
-            <div className="space-y-3">
-              {credentialFields.map((field) => (
-                <DynamicField
-                  key={field.key}
-                  config={field}
-                  value={
-                    (watchedCredentials as unknown as Record<string, string>)[
-                      field.key
-                    ] || ""
-                  }
-                  onChange={(value) =>
-                    handleCredentialFieldChange(field.key, value as string)
-                  }
-                  showPassword={showPasswordFields[field.key] || false}
-                  onTogglePassword={
-                    field.type === "password"
-                      ? () => togglePasswordVisibility(field.key)
-                      : undefined
-                  }
-                  error={
-                    errors.credentials &&
-                    typeof errors.credentials === "object" &&
-                    field.key in errors.credentials
-                      ? (
-                          errors.credentials as Record<
-                            string,
-                            { message?: string }
-                          >
-                        )[field.key]?.message
-                      : undefined
-                  }
-                />
-              ))}
-            </div>
-          </div>
+          <CredentialsField />
 
           {/* Region */}
           <div className="space-y-2">
