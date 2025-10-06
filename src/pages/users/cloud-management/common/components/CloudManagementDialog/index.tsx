@@ -43,6 +43,7 @@ import { CredentialsField } from "./fields/CredentialsField";
 import { RegionField } from "./fields/RegionField";
 import { CloudGroupField } from "./fields/CloudGroupField";
 import { ProxyUrlField } from "./fields/ProxyUrlField";
+import { ScanScheduleField } from "./fields/ScanScheduleField";
 
 // 프로바이더별 FormType 정의
 export type AWSFormType = {
@@ -354,41 +355,7 @@ export function CloudManagementDialog({
 
     return (
       <div className="space-y-6">
-        {/* Scan Schedule Setting */}
-        {supportsScheduleScan && (
-          <div className="space-y-4">
-            <Label className="text-sm font-medium text-gray-700">
-              Scan Schedule Setting
-            </Label>
-
-            <Controller
-              name="scheduleScanEnabled"
-              control={control}
-              render={({ field }) => (
-                <RadioGroup
-                  value={field.value ? "enabled" : "disabled"}
-                  onValueChange={(value: string) =>
-                    field.onChange(value === "enabled")
-                  }
-                  className="flex gap-6"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="enabled" id="enabled" />
-                    <Label htmlFor="enabled" className="text-sm">
-                      Enabled
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="disabled" id="disabled" />
-                    <Label htmlFor="disabled" className="text-sm">
-                      Disabled
-                    </Label>
-                  </div>
-                </RadioGroup>
-              )}
-            />
-          </div>
-        )}
+        <ScanScheduleField />
 
         {/* Set Scan Frequency */}
         {supportsScheduleScan && watchedScheduleScanEnabled && (
