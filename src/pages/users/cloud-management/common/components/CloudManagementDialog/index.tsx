@@ -43,6 +43,7 @@ import { DynamicField } from "@/components/DynamicField";
 import { getSchemaByProvider } from "@/pages/users/cloud-management/common/schemas/validationSchemas";
 import { CloudNameField } from "./fields/CloudNameField";
 import { SelectProviderField } from "./fields/SelectProviderField";
+import { CredentialTypeField } from "./fields/CredentialTypeField";
 
 // 프로바이더별 FormType 정의
 export type AWSFormType = {
@@ -365,7 +366,6 @@ export function CloudManagementDialog({
   };
 
   const renderStep1 = () => {
-    const providerConfig = getProviderConfig(watchedProvider);
     const credentialFields = getCredentialFields(
       watchedProvider,
       watchedCredentialType
@@ -377,55 +377,7 @@ export function CloudManagementDialog({
         <div className="space-y-6">
           <CloudNameField />
           <SelectProviderField />
-
-          {/* Select Key Registration Method */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-gray-700">
-              Select Key Registration Method
-            </Label>
-            <Controller
-              name="credentialType"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => {
-                    // credentialType 변경 시 credentials 초기화
-                    const emptyCredentials = (() => {
-                      switch (watchedProvider) {
-                        case "AWS":
-                          return {} as AWSCredential;
-                        case "AZURE":
-                          return {} as AzureCredential;
-                        case "GCP":
-                          return {} as GCPCredential;
-                        default:
-                          return {} as AWSCredential;
-                      }
-                    })();
-
-                    setValue("credentials", emptyCredentials);
-                    field.onChange(value);
-                  }}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {providerConfig.credentialTypes.map((type) => (
-                      <SelectItem
-                        key={type.value}
-                        value={type.value}
-                        disabled={type.value !== "ACCESS_KEY"}
-                      >
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </div>
+          <CredentialTypeField />
 
           {/* Dynamic Credentials Fields */}
           <div className="space-y-4">
