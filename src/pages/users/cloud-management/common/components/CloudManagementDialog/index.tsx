@@ -7,13 +7,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Provider,
@@ -44,6 +37,7 @@ import { RegionField } from "./fields/RegionField";
 import { CloudGroupField } from "./fields/CloudGroupField";
 import { ProxyUrlField } from "./fields/ProxyUrlField";
 import { ScanScheduleField } from "./fields/ScanScheduleField";
+import { ScanFrequencyField } from "./fields/ScanFrequencyField";
 
 // 프로바이더별 FormType 정의
 export type AWSFormType = {
@@ -92,22 +86,6 @@ export type GCPFormType = {
 };
 
 export type FormType = AWSFormType | AzureFormType | GCPFormType;
-
-const SCAN_HOURS = Array.from({ length: 24 }, (_, i) => {
-  const hour = i.toString().padStart(2, "0");
-  return {
-    value: hour,
-    label: `${hour}`,
-  };
-});
-
-const SCAN_MINUTES = Array.from({ length: 13 }, (_, i) => {
-  const minute = (i * 5).toString().padStart(2, "0");
-  return {
-    value: minute,
-    label: minute,
-  };
-});
 
 // 프로바이더별 기본값 생성 함수
 export const getDefaultFormValues = (provider: Provider): FormType => {
@@ -201,8 +179,6 @@ export function CloudManagementDialog({
   // 폼 데이터 감시
   const watchedProvider = watch("provider");
   const watchedCredentialType = watch("credentialType");
-  const watchedScheduleScanEnabled = watch("scheduleScanEnabled");
-  const watchedScanFrequency = watch("scheduleScanSetting");
   const watchedCredentials = watch("credentials");
   const watchedEventSource = watch("eventSource");
 
@@ -340,10 +316,6 @@ export function CloudManagementDialog({
 
   const renderStep2 = () => {
     const eventSourceFields = getEventSourceFields(watchedProvider);
-    const supportsScheduleScan = isFeatureSupported(
-      watchedProvider,
-      "scheduleScan"
-    );
     const supportsEventProcess = isFeatureSupported(
       watchedProvider,
       "eventProcess"
@@ -356,153 +328,7 @@ export function CloudManagementDialog({
     return (
       <div className="space-y-6">
         <ScanScheduleField />
-
-        {/* Set Scan Frequency */}
-        {supportsScheduleScan && watchedScheduleScanEnabled && (
-          <div className="space-y-4">
-            <Label className="text-sm font-medium text-gray-700">
-              Set Scan Frequency
-            </Label>
-
-            <div className="text-sm text-gray-600 mb-3">
-              Scan Schedule: Daily 12:00 AM
-            </div>
-
-            <Controller
-              name="scheduleScanSetting.frequency"
-              control={control}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="HOUR">Hourly</SelectItem>
-                    <SelectItem value="DAY">Daily</SelectItem>
-                    <SelectItem value="WEEK">Weekly</SelectItem>
-                    <SelectItem value="MONTH">Monthly</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-
-            {/* Frequency specific fields */}
-            <div className="grid grid-cols-3 gap-4">
-              {watchedScanFrequency?.frequency === "MONTH" && (
-                <div>
-                  <Label className="text-sm text-gray-600 mb-1 block">
-                    Date
-                  </Label>
-                  <Controller
-                    name="scheduleScanSetting.date"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.from({ length: 28 }, (_, i) => (
-                            <SelectItem key={i + 1} value={(i + 1).toString()}>
-                              {i + 1}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-              )}
-
-              {watchedScanFrequency?.frequency === "WEEK" && (
-                <div>
-                  <Label className="text-sm text-gray-600 mb-1 block">
-                    Day of Week
-                  </Label>
-                  <Controller
-                    name="scheduleScanSetting.weekday"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="MON">Monday</SelectItem>
-                          <SelectItem value="TUE">Tuesday</SelectItem>
-                          <SelectItem value="WED">Wednesday</SelectItem>
-                          <SelectItem value="THU">Thursday</SelectItem>
-                          <SelectItem value="FRI">Friday</SelectItem>
-                          <SelectItem value="SAT">Saturday</SelectItem>
-                          <SelectItem value="SUN">Sunday</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-              )}
-
-              {watchedScanFrequency?.frequency !== "HOUR" && (
-                <div>
-                  <Label className="text-sm text-gray-600 mb-1 block">
-                    Hour
-                  </Label>
-                  <Controller
-                    name="scheduleScanSetting.hour"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-60">
-                          {SCAN_HOURS.map((hour) => (
-                            <SelectItem key={hour.value} value={hour.value}>
-                              {hour.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-              )}
-
-              <div>
-                <Label className="text-sm text-gray-600 mb-1 block">
-                  Minute
-                </Label>
-                <Controller
-                  name="scheduleScanSetting.minute"
-                  control={control}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {SCAN_MINUTES.map((minute) => (
-                          <SelectItem key={minute.value} value={minute.value}>
-                            {minute.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        <ScanFrequencyField />
 
         {/* Event Integration */}
         {(supportsEventProcess ||
