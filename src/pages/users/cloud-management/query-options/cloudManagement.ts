@@ -1,5 +1,5 @@
-import { fetchAllClouds } from "@/mocks/cloudManagementData";
 import { queryOptions } from "@tanstack/react-query";
+import { fetchAllClouds } from "../apis/cloud";
 
 export const fetchAllCloudsQueryOptions = () =>
   queryOptions({

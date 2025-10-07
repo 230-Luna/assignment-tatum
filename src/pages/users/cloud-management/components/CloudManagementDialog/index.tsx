@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCloudById } from "@/mocks/cloudManagementData";
 import {
   Provider,
   AWSCredential,
@@ -35,6 +34,7 @@ import { SecretAccessKeyField } from "./fields/SecretAccessKeyField";
 import { AWSCredentialTypeField } from "./fields/AWSCredentialTypeField";
 import { CloudTrailNameField } from "./fields/CloudTrailNameField";
 import { useEffect } from "react";
+import { fetchCloudById } from "../../apis/cloud";
 
 // 프로바이더별 기본값 생성 함수
 export const getDefaultFormValues = (provider: Provider): FormType => {
