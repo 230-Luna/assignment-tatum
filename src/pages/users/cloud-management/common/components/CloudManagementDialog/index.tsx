@@ -6,11 +6,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCloudById } from "@/mocks/cloudManagementData";
 import {
   Provider,
   AWSCredential,
   AzureCredential,
   GCPCredential,
+  ScheduleScanFrequency,
+  ScheduleScanWeekday,
 } from "@/pages/users/cloud-management/common/models/cloudTypes";
 import { getSchemaByProvider } from "@/pages/users/cloud-management/common/schemas/validationSchemas";
 import { CloudNameField } from "./fields/CloudNameField";
@@ -30,6 +34,7 @@ import { AccessKeyIdField } from "./fields/AccessKeyIdField";
 import { SecretAccessKeyField } from "./fields/SecretAccessKeyField";
 import { AWSCredentialTypeField } from "./fields/AWSCredentialTypeField";
 import { CloudTrailNameField } from "./fields/CloudTrailNameField";
+import { useEffect } from "react";
 
 // 프로바이더별 기본값 생성 함수
 export const getDefaultFormValues = (provider: Provider): FormType => {
@@ -88,22 +93,42 @@ export function CloudManagementDialog({
   open,
   onClose,
   onComplete,
-  data,
+  cloudId,
 }: {
   open: boolean;
   onClose: () => void;
   onComplete: ({ data }: { data?: FormType }) => void;
-  data?: FormType;
+  cloudId?: string;
 }) {
+  const { data: serverData, isLoading } = useQuery({
+    queryKey: ["cloud", cloudId],
+    queryFn: () => fetchCloudById(cloudId!),
+    enabled: !!cloudId && open,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
   const form = useForm<FormType>({
-    defaultValues: data ?? getDefaultFormValues("AWS"),
+    defaultValues: getDefaultFormValues("AWS"),
     mode: "onChange",
   });
 
   const { handleSubmit, reset, clearErrors, setError } = form;
 
+  useEffect(() => {
+    if (cloudId && serverData && open) {
+      reset(serverData as FormType);
+    } else if (!cloudId && open) {
+      reset(getDefaultFormValues("AWS"));
+    }
+  }, [cloudId, serverData, open, reset]);
+
   const handleCancel = () => {
-    reset(data);
+    if (serverData) {
+      reset(serverData as FormType);
+    } else {
+      reset(getDefaultFormValues("AWS"));
+    }
     onClose();
   };
 
@@ -129,23 +154,14 @@ export function CloudManagementDialog({
       ...formData,
       scheduleScanSetting: formData.scheduleScanEnabled
         ? {
-            frequency: formData.scheduleScanSetting?.frequency as
-              | "HOUR"
-              | "DAY"
-              | "WEEK"
-              | "MONTH",
+            frequency: formData.scheduleScanSetting
+              ?.frequency as ScheduleScanFrequency,
             ...(formData.scheduleScanSetting?.frequency === "MONTH" && {
               date: formData.scheduleScanSetting?.date,
             }),
             ...(formData.scheduleScanSetting?.frequency === "WEEK" && {
-              weekday: formData.scheduleScanSetting?.weekday as
-                | "MON"
-                | "TUE"
-                | "WED"
-                | "THU"
-                | "FRI"
-                | "SAT"
-                | "SUN",
+              weekday: formData.scheduleScanSetting
+                ?.weekday as ScheduleScanWeekday,
             }),
             ...(formData.scheduleScanSetting?.frequency !== "HOUR" && {
               hour: formData.scheduleScanSetting?.hour,
@@ -167,41 +183,55 @@ export function CloudManagementDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{data ? "Edit" : "Create"} Cloud</DialogTitle>
+          <DialogTitle>{cloudId ? "Edit" : "Create"} Cloud</DialogTitle>
         </DialogHeader>
-        <FormProvider {...form}>
-          <div className="space-y-6">
-            <CloudNameField />
-            <SelectProviderField />
-            {form.watch("provider") === "AWS" && (
-              <>
-                <AWSCredentialTypeField />
-                {form.watch("credentialType") === "ACCESS_KEY" && (
-                  <>
-                    <AccessKeyIdField />
-                    <SecretAccessKeyField />
-                  </>
-                )}
-                <CloudTrailNameField />
-              </>
-            )}
-            <CloudGroupField />
-            <EventProcessEnabledField />
-            <UserActivityEnabledField />
-            <ScheduleScanEnabledField />
-            {form.watch("scheduleScanEnabled") === true ? (
-              <ScheduleScanSettingField />
-            ) : null}
-            <RegionField />
-            <ProxyUrlField />
+
+        {isLoading && cloudId && (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            <span className="ml-2">데이터를 불러오는 중...</span>
           </div>
-        </FormProvider>
+        )}
+
+        {(!isLoading || !cloudId) && (
+          <FormProvider {...form}>
+            <div className="space-y-6">
+              <CloudNameField />
+              <SelectProviderField />
+              {form.watch("provider") === "AWS" && (
+                <>
+                  <AWSCredentialTypeField />
+                  {form.watch("credentialType") === "ACCESS_KEY" && (
+                    <>
+                      <AccessKeyIdField />
+                      <SecretAccessKeyField />
+                    </>
+                  )}
+                  <CloudTrailNameField />
+                </>
+              )}
+              <CloudGroupField />
+              <EventProcessEnabledField />
+              <UserActivityEnabledField />
+              <ScheduleScanEnabledField />
+              {form.watch("scheduleScanEnabled") === true ? (
+                <ScheduleScanSettingField />
+              ) : null}
+              <RegionField />
+              <ProxyUrlField />
+            </div>
+          </FormProvider>
+        )}
 
         <div className="flex justify-end gap-3 mt-8 pt-6 border-t">
           <Button type="button" variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleConfirmClick}>
+          <Button
+            type="button"
+            onClick={handleConfirmClick}
+            disabled={isLoading && !!cloudId}
+          >
             Confirm
           </Button>
         </div>

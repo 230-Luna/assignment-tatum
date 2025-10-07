@@ -1,6 +1,5 @@
 import { Cloud } from "@/pages/users/cloud-management/common/models/cloudTypes";
-import { mockCloudData } from "@/mocks/cloudManagementData";
-
+import { fetchAllClouds } from "@/mocks/cloudManagementData";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -46,7 +45,7 @@ export function CloudManagementPage() {
 export function CloudTable() {
   const { data: clouds } = useSuspenseQuery<Cloud[]>({
     queryKey: ["clouds"],
-    queryFn: () => mockCloudData,
+    queryFn: fetchAllClouds,
   });
 
   const overlay = useOverlay();
@@ -124,7 +123,7 @@ function CloudTableRow({ cloud }: { cloud: Cloud }) {
             close();
             resolve(data || null);
           }}
-          data={cloud as FormType}
+          cloudId={cloud.id}
         />
       ));
     });
