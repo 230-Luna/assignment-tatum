@@ -39,6 +39,7 @@ export function CloudTable() {
         if (result == null) {
           return;
         }
+        console.log("서버 전송용 페이로드:", result);
       } catch (error) {
         window.alert("An error occurred while creating the cloud.");
       }
@@ -94,6 +95,7 @@ function CloudTableRow({ cloud }: { cloud: Cloud }) {
       if (result == null) {
         return;
       }
+      console.log("서버 전송용 페이로드:", result);
     },
   });
 

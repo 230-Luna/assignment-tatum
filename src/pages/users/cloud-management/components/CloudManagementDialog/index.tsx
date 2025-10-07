@@ -93,8 +93,6 @@ function CloudManagementDialogContent({
       return;
     }
 
-    clearErrors();
-
     const payload = {
       ...formData,
       scheduleScanSetting: formData.scheduleScanEnabled
@@ -114,10 +112,9 @@ function CloudManagementDialogContent({
             minute: formData.scheduleScanSetting?.minute,
           }
         : undefined,
-    } as FormType;
+    };
 
     onComplete({ data: payload });
-    console.log("서버 전송용 페이로드:", payload);
   };
 
   return (
