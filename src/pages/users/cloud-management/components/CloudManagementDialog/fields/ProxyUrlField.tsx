@@ -12,23 +12,17 @@ export function ProxyUrlField() {
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <Label>Proxy URL</Label>
-      </div>
+      <Label>Proxy URL</Label>
       <Controller
         name="proxyUrl"
         control={control}
         render={({ field }) => (
-          <div>
-            <Input
-              placeholder="Please enter the proxy URL."
-              {...field}
-              hasError={!!errors.proxyUrl}
-            />
-            {errors.proxyUrl ? (
+          <>
+            <Input placeholder="Please enter the proxy URL." {...field} />
+            {errors.proxyUrl != null ? (
               <ErrorMessage>{errors.proxyUrl.message}</ErrorMessage>
             ) : null}
-          </div>
+          </>
         )}
       />
     </div>

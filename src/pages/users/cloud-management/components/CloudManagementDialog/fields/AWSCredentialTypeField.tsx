@@ -7,15 +7,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FormType } from "@/pages/users/cloud-management/models/ProviderFormType";
+import { AWSFormType } from "@/pages/users/cloud-management/models/ProviderFormType";
 import { AWSCredentialType } from "@/pages/users/cloud-management/models/cloudTypes";
-import { ErrorMessage } from "../../ErrorMessage";
 
 export function AWSCredentialTypeField() {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<FormType>();
+  const { control, watch } = useFormContext<AWSFormType>();
+  const watchedProvider = watch("provider");
+
+  if (watchedProvider !== "AWS") {
+    throw new Error("AWSCredentialTypeField is only available for AWS");
+  }
 
   return (
     <div className="space-y-2">
@@ -29,30 +30,25 @@ export function AWSCredentialTypeField() {
           required: "Credential Type은 필수입니다.",
         }}
         render={({ field }) => (
-          <div>
-            <Select
-              value={field.value as AWSCredentialType}
-              onValueChange={(value: AWSCredentialType) => {
-                field.onChange(value);
-              }}
-            >
-              <SelectTrigger className="w-full" id="credentialType">
-                <SelectValue placeholder="Select credential type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ACCESS_KEY">Access Key</SelectItem>
-                <SelectItem value="ASSUME_ROLE" disabled={true}>
-                  Assume Role
-                </SelectItem>
-                <SelectItem value="ROLES_ANYWHERE" disabled={true}>
-                  Roles Anywhere
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            {errors?.credentialType ? (
-              <ErrorMessage>{errors.credentialType.message}</ErrorMessage>
-            ) : null}
-          </div>
+          <Select
+            value={field.value as AWSCredentialType}
+            onValueChange={(value: AWSCredentialType) => {
+              field.onChange(value);
+            }}
+          >
+            <SelectTrigger className="w-full" id="credentialType">
+              <SelectValue placeholder="Select credential type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ACCESS_KEY">Access Key</SelectItem>
+              <SelectItem value="ASSUME_ROLE" disabled={true}>
+                Assume Role
+              </SelectItem>
+              <SelectItem value="ROLES_ANYWHERE" disabled={true}>
+                Roles Anywhere
+              </SelectItem>
+            </SelectContent>
+          </Select>
         )}
       />
     </div>

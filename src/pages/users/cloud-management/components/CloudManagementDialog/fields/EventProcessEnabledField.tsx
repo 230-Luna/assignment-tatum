@@ -13,13 +13,11 @@ export function EventProcessEnabledField() {
         name="eventProcessEnabled"
         control={control}
         render={({ field }) => (
-          <div>
-            <Switch
-              id="eventProcessEnabled"
-              checked={field.value}
-              onCheckedChange={(checked) => field.onChange(checked)}
-            />
-          </div>
+          <Switch
+            id="eventProcessEnabled"
+            checked={field.value}
+            onCheckedChange={(checked) => field.onChange(checked)}
+          />
         )}
       />
     </div>

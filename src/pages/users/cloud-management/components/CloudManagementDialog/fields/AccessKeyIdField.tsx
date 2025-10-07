@@ -1,14 +1,21 @@
 import { Label } from "@/components/ui/label";
 import { Controller, useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { FormType } from "@/pages/users/cloud-management/models/ProviderFormType";
+import { AWSFormType } from "@/pages/users/cloud-management/models/ProviderFormType";
 import { ErrorMessage } from "../../ErrorMessage";
 
 export function AccessKeyIdField() {
   const {
     control,
+    watch,
     formState: { errors },
-  } = useFormContext<FormType>();
+  } = useFormContext<AWSFormType>();
+
+  const watchedProvider = watch("provider");
+
+  if (watchedProvider !== "AWS") {
+    throw new Error("AccessKeyIdField is only available for AWS");
+  }
 
   return (
     <div className="space-y-2">
@@ -21,21 +28,23 @@ export function AccessKeyIdField() {
         rules={{
           required: "Access Key ID is required.",
         }}
-        render={({ field }) => (
-          <div>
-            <Input
-              id="accessKeyId"
-              placeholder="Please enter the access key ID."
-              {...field}
-              hasError={!!errors?.credentials}
-            />
-            {errors?.credentials &&
-            typeof errors.credentials === "object" &&
-            "message" in errors.credentials ? (
-              <ErrorMessage>{errors.credentials.message}</ErrorMessage>
-            ) : null}
-          </div>
-        )}
+        render={({ field }) => {
+          return (
+            <>
+              <Input
+                id="accessKeyId"
+                placeholder="Please enter the access key ID."
+                {...field}
+                hasError={errors?.credentials?.accessKeyId != null}
+              />
+              {errors?.credentials?.accessKeyId != null ? (
+                <ErrorMessage>
+                  {errors.credentials.accessKeyId.message}
+                </ErrorMessage>
+              ) : null}
+            </>
+          );
+        }}
       />
     </div>
   );

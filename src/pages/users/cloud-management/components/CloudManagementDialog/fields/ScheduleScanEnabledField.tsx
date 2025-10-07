@@ -13,13 +13,11 @@ export function ScheduleScanEnabledField() {
         name="scheduleScanEnabled"
         control={control}
         render={({ field }) => (
-          <div>
-            <Switch
-              id="scheduleScanEnabled"
-              checked={field.value}
-              onCheckedChange={(checked) => field.onChange(checked)}
-            />
-          </div>
+          <Switch
+            id="scheduleScanEnabled"
+            checked={field.value}
+            onCheckedChange={(checked) => field.onChange(checked)}
+          />
         )}
       />
     </div>

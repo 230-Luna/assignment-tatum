@@ -46,9 +46,7 @@ export function RegionField() {
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <Label>Region</Label>
-      </div>
+      <Label>Region</Label>
       <div className="relative">
         <div className="border rounded-md bg-white">
           <div

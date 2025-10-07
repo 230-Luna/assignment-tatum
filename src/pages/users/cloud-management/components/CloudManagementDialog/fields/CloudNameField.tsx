@@ -22,17 +22,17 @@ export function CloudNameField() {
           required: "Cloud Name is required.",
         }}
         render={({ field }) => (
-          <div>
+          <>
             <Input
               id="cloudName"
               placeholder="Please enter the cloud name."
               {...field}
-              hasError={!!errors.name}
+              hasError={errors.name != null}
             />
-            {errors.name ? (
+            {errors.name != null ? (
               <ErrorMessage>{errors.name.message}</ErrorMessage>
             ) : null}
-          </div>
+          </>
         )}
       />
     </div>
