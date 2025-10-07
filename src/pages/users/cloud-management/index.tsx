@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { SSRSuspense } from "@/components/SSRSuspense";
 
 import { CloudManagementDialog } from "./components/CloudManagementDialog";
@@ -22,6 +22,7 @@ import { IconButton } from "@/components/IconButton";
 import { FormType } from "./models/ProviderFormType";
 import { fetchAllCloudsQueryOptions } from "./query-options/cloudManagement";
 import { Skeleton } from "@/components/Skeleton";
+import { useCloudManagementDialog } from "./hooks/useCloudManagementDialog";
 
 export function CloudManagementPage() {
   return (
@@ -34,35 +35,30 @@ export function CloudManagementPage() {
 export function CloudTable() {
   const { data: clouds } = useSuspenseQuery(fetchAllCloudsQueryOptions());
 
-  const overlay = useOverlay();
+  const openCloudManagementDialog = useCloudManagementDialog();
 
-  const handleCreateCloud = async () => {
-    const result = await new Promise<FormType | null>((resolve) => {
-      overlay.open(({ isOpen, close }) => (
-        <CloudManagementDialog
-          open={isOpen}
-          onClose={() => {
-            close();
-            resolve(null);
-          }}
-          onComplete={({ data }) => {
-            close();
-            resolve(data || null);
-          }}
-        />
-      ));
-    });
-
-    if (result == null) {
-      return;
-    }
-  };
+  const handleCreateCloudButtonlick = useMutation({
+    mutationFn: async () => {
+      try {
+        const result = await openCloudManagementDialog();
+        if (result == null) {
+          return;
+        }
+      } catch (error) {
+        window.alert("An error occurred while creating the cloud.");
+      }
+    },
+  });
 
   return (
     <div className="p-6 max-w-full">
       <div className="mb-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Cloud Management</h1>
-        <Button onClick={handleCreateCloud} icon={<Plus />}>
+        <Button
+          disabled={handleCreateCloudButtonlick.isPending}
+          onClick={() => handleCreateCloudButtonlick.mutate()}
+          icon={<Plus />}
+        >
           Create Cloud
         </Button>
       </div>
@@ -93,43 +89,36 @@ export function CloudTable() {
 }
 
 function CloudTableRow({ cloud }: { cloud: Cloud }) {
-  const overlay = useOverlay();
   const confirmDialog = useConfirmDialog();
+  const openCloudManagementDialog = useCloudManagementDialog();
 
-  const handleEditCloud = async (cloud: Cloud) => {
-    const result = await new Promise<FormType | null>((resolve) => {
-      overlay.open(({ isOpen, close }) => (
-        <CloudManagementDialog
-          open={isOpen}
-          onClose={() => {
-            close();
-            resolve(null);
-          }}
-          onComplete={({ data }) => {
-            close();
-            resolve(data || null);
-          }}
-          cloudId={cloud.id}
-        />
-      ));
-    });
+  const handleEditCloudButtonClick = useMutation({
+    mutationFn: async () => {
+      const result = await openCloudManagementDialog({ cloudId: cloud.id });
 
-    if (result == null) {
-      return;
-    }
-  };
+      if (result == null) {
+        return;
+      }
+    },
+  });
 
-  const handleDeleteCloud = async (cloud: Cloud) => {
-    const confirmed = await confirmDialog.open({
-      content: "Are you sure you want to delete this cloud?",
-      cancelButtonText: "Cancel",
-      confirmButtonText: "Delete",
-    });
+  const handleDeleteCloudButtonClick = useMutation({
+    mutationFn: async () => {
+      try {
+        const confirmed = await confirmDialog.open({
+          content: "Are you sure you want to delete this cloud?",
+          cancelButtonText: "Cancel",
+          confirmButtonText: "Delete",
+        });
 
-    if (confirmed) {
-      return cloud;
-    }
-  };
+        if (confirmed) {
+          // CLOUD DELETE API CALL
+        }
+      } catch (error) {
+        window.alert("An error occurred while deleting the cloud.");
+      }
+    },
+  });
 
   return (
     <TableRow key={cloud.id}>
@@ -158,28 +147,28 @@ function CloudTableRow({ cloud }: { cloud: Cloud }) {
           : "-"}
       </TableCell>
       <TableCell>
-        <Badge
-          variant={
-            cloud.eventProcessEnabled && cloud.scheduleScanEnabled
-              ? "blue"
-              : "red"
-          }
-        >
-          {cloud.eventProcessEnabled && cloud.scheduleScanEnabled
-            ? "READY"
-            : "ERROR"}
-        </Badge>
+        {cloud.eventProcessEnabled && cloud.scheduleScanEnabled ? (
+          <Badge variant="blue">READY</Badge>
+        ) : (
+          <Badge variant="red">ERROR</Badge>
+        )}
       </TableCell>
       <TableCell>
-        <Badge variant={cloud.eventProcessEnabled ? "green" : "orange"}>
-          {cloud.eventProcessEnabled ? "VALID" : "INVALID"}
-        </Badge>
+        {cloud.eventProcessEnabled ? (
+          <Badge variant="green">VALID</Badge>
+        ) : (
+          <Badge variant="orange">INVALID</Badge>
+        )}
       </TableCell>
       <TableCell>
         <IconButton
           variant="ghost"
           size="icon-sm"
-          onClick={() => handleEditCloud(cloud)}
+          disabled={
+            handleEditCloudButtonClick.isPending ||
+            handleDeleteCloudButtonClick.isPending
+          }
+          onClick={() => handleEditCloudButtonClick.mutate()}
           icon={<Edit />}
         />
       </TableCell>
@@ -187,7 +176,11 @@ function CloudTableRow({ cloud }: { cloud: Cloud }) {
         <IconButton
           variant="ghost"
           size="icon-sm"
-          onClick={() => handleDeleteCloud(cloud)}
+          disabled={
+            handleEditCloudButtonClick.isPending ||
+            handleDeleteCloudButtonClick.isPending
+          }
+          onClick={() => handleDeleteCloudButtonClick.mutate()}
           icon={<Trash2 />}
         />
       </TableCell>
