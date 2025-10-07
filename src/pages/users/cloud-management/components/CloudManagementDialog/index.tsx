@@ -15,18 +15,18 @@ import {
   GCPCredential,
   ScheduleScanFrequency,
   ScheduleScanWeekday,
-} from "@/pages/users/cloud-management/common/models/cloudTypes";
-import { getSchemaByProvider } from "@/pages/users/cloud-management/common/schemas/validationSchemas";
+} from "@/pages/users/cloud-management/models/cloudTypes";
+import { getSchemaByProvider } from "@/pages/users/cloud-management/schemas/validationSchemas";
 import { CloudNameField } from "./fields/CloudNameField";
 import { SelectProviderField } from "./fields/SelectProviderField";
 import { RegionField } from "./fields/RegionField";
 import { CloudGroupField } from "./fields/CloudGroupField";
 import { ProxyUrlField } from "./fields/ProxyUrlField";
 import { ScheduleScanSettingField } from "./fields/ScheduleScanSettingField";
-import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
-import { AWSFormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
-import { AzureFormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
-import { GCPFormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
+import { FormType } from "@/pages/users/cloud-management/models/ProviderFormType";
+import { AWSFormType } from "@/pages/users/cloud-management/models/ProviderFormType";
+import { AzureFormType } from "@/pages/users/cloud-management/models/ProviderFormType";
+import { GCPFormType } from "@/pages/users/cloud-management/models/ProviderFormType";
 import { EventProcessEnabledField } from "./fields/EventProcessEnabledField";
 import { UserActivityEnabledField } from "./fields/UserActivityEnabled";
 import { ScheduleScanEnabledField } from "./fields/ScheduleScanEnabledField";

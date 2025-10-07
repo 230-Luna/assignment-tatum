@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
-import { Provider } from "@/pages/users/cloud-management/common/models/cloudTypes";
+import { Provider } from "@/pages/users/cloud-management/models/cloudTypes";
 import { SelectValue } from "@/components/ui/select";
 import { getDefaultFormValues } from "../index";
 

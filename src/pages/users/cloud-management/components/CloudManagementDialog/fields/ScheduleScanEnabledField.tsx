@@ -1,21 +1,21 @@
 import { Controller, useFormContext } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
+import { FormType } from "@/pages/users/cloud-management/models/ProviderFormType";
 
-export function UserActivityEnabledField() {
+export function ScheduleScanEnabledField() {
   const { control } = useFormContext<FormType>();
 
   return (
     <div className="flex content-center  gap-4">
-      <Label htmlFor="userActivityEnabled">User Activity Enabled</Label>
+      <Label htmlFor="scheduleScanEnabled">Schedule Scan Enabled</Label>
       <Controller
-        name="userActivityEnabled"
+        name="scheduleScanEnabled"
         control={control}
         render={({ field }) => (
           <div>
             <Switch
-              id="userActivityEnabled"
+              id="scheduleScanEnabled"
               checked={field.value}
               onCheckedChange={(checked) => field.onChange(checked)}
             />

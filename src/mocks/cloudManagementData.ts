@@ -2,7 +2,7 @@ import {
   Cloud,
   AWSCredential,
   AWSEventSource,
-} from "@/pages/users/cloud-management/common/models/cloudTypes";
+} from "@/pages/users/cloud-management/models/cloudTypes";
 
 // Mock 클라우드 데이터
 export const mockCloudData: Cloud[] = [

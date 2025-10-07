@@ -7,8 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
-import { AWSCredentialType } from "@/pages/users/cloud-management/common/models/cloudTypes";
+import { FormType } from "@/pages/users/cloud-management/models/ProviderFormType";
+import { AWSCredentialType } from "@/pages/users/cloud-management/models/cloudTypes";
 import { ErrorMessage } from "../../ErrorMessage";
 
 export function AWSCredentialTypeField() {

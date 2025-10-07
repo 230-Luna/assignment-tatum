@@ -1,10 +1,10 @@
 import { Label } from "@/components/ui/label";
 import { Controller, useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
+import { FormType } from "@/pages/users/cloud-management/models/ProviderFormType";
 import { ErrorMessage } from "../../ErrorMessage";
 
-export function SecretAccessKeyField() {
+export function RoleArnField() {
   const {
     control,
     watch,
@@ -19,20 +19,18 @@ export function SecretAccessKeyField() {
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="secretAccessKey" required>
-        Secret Access Key
-      </Label>
+      <div className="flex items-center gap-2">
+        <Label htmlFor="roleArn">Role ARN</Label>
+        <span className="text-xs text-gray-500">(Optional)</span>
+      </div>
       <Controller
-        name="credentials.secretAccessKey"
+        name="credentials.roleArn"
         control={control}
-        rules={{
-          required: "Secret Access Key is required.",
-        }}
         render={({ field }) => (
           <div>
             <Input
-              id="secretAccessKey"
-              placeholder="Please enter the secret access key."
+              id="roleArn"
+              placeholder="Please enter the role ARN (optional)."
               {...field}
               hasError={!!errors?.credentials}
             />

@@ -1,4 +1,4 @@
-import { Cloud } from "@/pages/users/cloud-management/common/models/cloudTypes";
+import { Cloud } from "@/pages/users/cloud-management/models/cloudTypes";
 import { fetchAllClouds } from "@/mocks/cloudManagementData";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,39 +14,25 @@ import Image from "next/image";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { SSRSuspense } from "@/components/SSRSuspense";
 
-import { CloudManagementDialog } from "./common/components/CloudManagementDialog";
+import { CloudManagementDialog } from "./components/CloudManagementDialog";
 import { useOverlay } from "@/hooks/useOverlay";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import { Edit, Plus, Trash2 } from "lucide-react";
 import { IconButton } from "@/components/IconButton";
-import { FormType } from "./common/models/ProviderFormType";
+import { FormType } from "./models/ProviderFormType";
+import { fetchAllCloudsQueryOptions } from "./query-options/cloudManagement";
+import { Skeleton } from "@/components/Skeleton";
 
 export function CloudManagementPage() {
   return (
-    <SSRSuspense
-      fallback={
-        <div className="p-6">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-            <div className="space-y-3">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-16 bg-gray-200 rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      }
-    >
+    <SSRSuspense fallback={<Skeleton />}>
       <CloudTable />
     </SSRSuspense>
   );
 }
 
 export function CloudTable() {
-  const { data: clouds } = useSuspenseQuery<Cloud[]>({
-    queryKey: ["clouds"],
-    queryFn: fetchAllClouds,
-  });
+  const { data: clouds } = useSuspenseQuery(fetchAllCloudsQueryOptions());
 
   const overlay = useOverlay();
 

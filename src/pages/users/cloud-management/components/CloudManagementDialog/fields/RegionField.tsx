@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Check, ChevronDown } from "lucide-react";
-import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
+import { FormType } from "@/pages/users/cloud-management/models/ProviderFormType";
 import {
   AWSRegionList,
   AzureRegionList,
   GCPRegionList,
-} from "@/pages/users/cloud-management/common/models/cloudTypes";
+} from "@/pages/users/cloud-management/models/cloudTypes";
 
 export function RegionField() {
   const [regionDropdownOpen, setRegionDropdownOpen] = useState(false);

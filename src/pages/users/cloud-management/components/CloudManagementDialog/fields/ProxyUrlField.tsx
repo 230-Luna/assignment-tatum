@@ -1,10 +1,10 @@
 import { Label } from "@/components/ui/label";
 import { Controller, useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { FormType } from "@/pages/users/cloud-management/common/models/ProviderFormType";
+import { FormType } from "@/pages/users/cloud-management/models/ProviderFormType";
 import { ErrorMessage } from "../../ErrorMessage";
 
-export function CloudNameField() {
+export function ProxyUrlField() {
   const {
     control,
     formState: { errors },
@@ -12,25 +12,21 @@ export function CloudNameField() {
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="cloudName" required>
-        Cloud Name
-      </Label>
+      <div className="flex items-center gap-2">
+        <Label>Proxy URL</Label>
+      </div>
       <Controller
-        name="name"
+        name="proxyUrl"
         control={control}
-        rules={{
-          required: "Cloud Name is required.",
-        }}
         render={({ field }) => (
           <div>
             <Input
-              id="cloudName"
-              placeholder="Please enter the cloud name."
+              placeholder="Please enter the proxy URL."
               {...field}
-              hasError={!!errors.name}
+              hasError={!!errors.proxyUrl}
             />
-            {errors.name ? (
-              <ErrorMessage>{errors.name.message}</ErrorMessage>
+            {errors.proxyUrl ? (
+              <ErrorMessage>{errors.proxyUrl.message}</ErrorMessage>
             ) : null}
           </div>
         )}
