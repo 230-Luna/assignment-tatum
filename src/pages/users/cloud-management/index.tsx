@@ -89,7 +89,7 @@ function CloudTableRow({ cloud }: { cloud: Cloud }) {
 
   const handleEditCloudButtonClick = useMutation({
     mutationFn: async () => {
-      const result = await openCloudManagementDialog({ cloudId: cloud.id });
+      const result = await openCloudManagementDialog({ initialData: cloud });
 
       if (result == null) {
         return;

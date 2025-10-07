@@ -1,11 +1,12 @@
 import { useOverlay } from "@/hooks/useOverlay";
 import { FormType } from "../models/ProviderFormType";
 import { CloudManagementDialog } from "../components/CloudManagementDialog";
+import { Cloud } from "../models/cloudTypes";
 
 export const useCloudManagementDialog = () => {
   const overlay = useOverlay();
 
-  return (payload: { cloudId?: string } = {}) =>
+  return (payload: { initialData?: Cloud } = {}) =>
     new Promise<FormType | null>((resolve) => {
       overlay.open(({ isOpen, close }) => (
         <CloudManagementDialog
@@ -18,7 +19,7 @@ export const useCloudManagementDialog = () => {
             close();
             resolve(data || null);
           }}
-          cloudId={payload.cloudId}
+          initialData={payload.initialData}
         />
       ));
     });
