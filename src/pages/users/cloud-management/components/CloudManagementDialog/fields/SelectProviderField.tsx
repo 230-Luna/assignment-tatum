@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { Provider } from "@/pages/users/cloud-management/models/cloudTypes";
 import { SelectValue } from "@/components/ui/select";
-import { getDefaultFormValues } from "../index";
+import { getDefaultFormValues } from "../utils/getDefaultFormValues";
 
 export function SelectProviderField() {
   const { control, getValues, reset } = useFormContext();

@@ -8,10 +8,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Provider,
-  AWSCredential,
-  AzureCredential,
-  GCPCredential,
   ScheduleScanFrequency,
   ScheduleScanWeekday,
 } from "@/pages/users/cloud-management/models/cloudTypes";
@@ -23,9 +19,6 @@ import { CloudGroupField } from "./fields/CloudGroupField";
 import { ProxyUrlField } from "./fields/ProxyUrlField";
 import { ScheduleScanSettingField } from "./fields/ScheduleScanSettingField";
 import { FormType } from "@/pages/users/cloud-management/models/ProviderFormType";
-import { AWSFormType } from "@/pages/users/cloud-management/models/ProviderFormType";
-import { AzureFormType } from "@/pages/users/cloud-management/models/ProviderFormType";
-import { GCPFormType } from "@/pages/users/cloud-management/models/ProviderFormType";
 import { EventProcessEnabledField } from "./fields/EventProcessEnabledField";
 import { UserActivityEnabledField } from "./fields/UserActivityEnabled";
 import { ScheduleScanEnabledField } from "./fields/ScheduleScanEnabledField";
@@ -35,59 +28,7 @@ import { AWSCredentialTypeField } from "./fields/AWSCredentialTypeField";
 import { CloudTrailNameField } from "./fields/CloudTrailNameField";
 import { useEffect } from "react";
 import { fetchCloudById } from "../../apis/cloud";
-
-// 프로바이더별 기본값 생성 함수
-export const getDefaultFormValues = (provider: Provider): FormType => {
-  const baseValues = {
-    name: "",
-    cloudGroupName: [],
-    regionList: ["global"],
-    proxyUrl: "",
-    eventProcessEnabled: false,
-    userActivityEnabled: false,
-    scheduleScanEnabled: false,
-    scheduleScanSetting: {
-      frequency: "HOUR" as const,
-      hour: "0",
-      minute: "0",
-    },
-    eventSource: undefined,
-  };
-
-  switch (provider) {
-    case "AWS":
-      return {
-        ...baseValues,
-        provider: "AWS",
-        credentialType: "ACCESS_KEY",
-        credentials: {} as AWSCredential,
-      } as AWSFormType;
-
-    case "AZURE":
-      return {
-        ...baseValues,
-        provider: "AZURE",
-        credentialType: "APPLICATION",
-        credentials: {} as AzureCredential,
-      } as AzureFormType;
-
-    case "GCP":
-      return {
-        ...baseValues,
-        provider: "GCP",
-        credentialType: "JSON_TEXT",
-        credentials: {} as GCPCredential,
-      } as GCPFormType;
-
-    default:
-      return {
-        ...baseValues,
-        provider: "AWS",
-        credentialType: "ACCESS_KEY",
-        credentials: {} as AWSCredential,
-      } as AWSFormType;
-  }
-};
+import { getDefaultFormValues } from "./utils/getDefaultFormValues";
 
 export function CloudManagementDialog({
   open,
