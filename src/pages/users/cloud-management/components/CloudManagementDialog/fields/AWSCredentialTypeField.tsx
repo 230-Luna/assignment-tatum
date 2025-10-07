@@ -14,15 +14,8 @@ import { ErrorMessage } from "../../ErrorMessage";
 export function AWSCredentialTypeField() {
   const {
     control,
-    watch,
     formState: { errors },
   } = useFormContext<FormType>();
-
-  const provider = watch("provider");
-
-  if (provider !== "AWS") {
-    return null;
-  }
 
   return (
     <div className="space-y-2">

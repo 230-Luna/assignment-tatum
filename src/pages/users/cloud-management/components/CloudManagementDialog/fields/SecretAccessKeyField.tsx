@@ -7,15 +7,8 @@ import { ErrorMessage } from "../../ErrorMessage";
 export function SecretAccessKeyField() {
   const {
     control,
-    watch,
     formState: { errors },
   } = useFormContext<FormType>();
-
-  const provider = watch("provider");
-
-  if (provider !== "AWS") {
-    return null;
-  }
 
   return (
     <div className="space-y-2">
